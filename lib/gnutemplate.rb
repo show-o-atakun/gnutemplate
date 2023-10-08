@@ -2,6 +2,7 @@
 
 require_relative "gnutemplate/version"
 require "numo/gnuplot"
+require "histogram/array"
 
 module Gnutemplate
   class Error < StandardError; end
