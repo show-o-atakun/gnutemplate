@@ -65,7 +65,7 @@ module Gnutemplate
       # X軸はこの場合配列にしなきゃだめ(to_a) これは癖をつけたほうが安全
 
       args = rows_min.zip(rows_max, titlenames).each.with_index.inject([]) do |result, ((mi, ma, t), i)|
-        result += [xrange.to_a, mi, mi, ma, ma, {with: "candlesticks", fc_rgb: colors[i % 4], title: t} ]
+        result += [xrange.to_a, mi.to_a, mi.to_a, ma.to_a, ma.to_a, {with: "candlesticks", fc_rgb: colors[i % 4], title: t} ]
       end
 
       plot *args
@@ -105,7 +105,7 @@ module Gnutemplate
       # X軸はこの場合配列にしなきゃだめ(to_a) これは癖をつけたほうが安全
 
       args = rows_min.zip(rows_max, titlenames).each.with_index.inject([]) do |result, ((mi, ma, t), i)|
-        result += [xrange.to_a, mi, mi, ma, ma, {with: "candlesticks", fc_rgb: colors[i % 4], title: t} ]
+        result += [xrange.to_a, mi.to_a, mi.to_a, ma.to_a, ma.to_a, {with: "candlesticks", fc_rgb: colors[i % 4], title: t} ]
       end
 
       plot *args
@@ -114,16 +114,18 @@ module Gnutemplate
 
   def note_histogram(data, labels: nil, pileup: true,
     xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
-    figsize: 1.0, rotate_xtics: nil,
+    figsize: 1.0, rotate_xtics: 45,
     fill: true, alpha: 33, background: nil,
     file: nil, engine: :note)
+
+    data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
     xmax ||= data.flatten.max
     xmin ||= data.flatten.min
-    freqs = data.map {|d| d.histogram(bins, min: xmin, max: xmax) }
+    freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
     Numo.noteplot do
@@ -173,7 +175,7 @@ module Gnutemplate
         set :style, :histogram, :cluster, gap:1
         set :style, :fill_solid, border:-1
         set boxwidth:0.9
-        set :xtic, :rotate, by:-45, scale:0
+        set :xtic, :rotate, by: rotate_xtics, scale: 0
 
         xticinterval = (xmax-xmin).to_f / bins
         set xrange: 0..((xmax-xmin) / xticinterval).to_i
@@ -195,16 +197,18 @@ module Gnutemplate
 
   def draw_histogram(data, labels: nil, pileup: true,
     xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
-    figsize: 1.0, rotate_xtics: nil,
+    figsize: 1.0, rotate_xtics: 45,
     fill: true, alpha: 33, background: nil,
     file: nil, engine: :note)
+
+    data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
     xmax ||= data.flatten.max
     xmin ||= data.flatten.min
-    freqs = data.map {|d| d.histogram(bins, min: xmin, max: xmax) }
+    freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
     Numo.gnuplot do
@@ -253,7 +257,7 @@ module Gnutemplate
         set :style, :histogram, :cluster, gap:1
         set :style, :fill_solid, border:-1
         set boxwidth:0.9
-        set :xtic, :rotate, by:-45, scale:0
+        set :xtic, :rotate, by: rotate_xtics, scale: 0
 
         xticinterval = (xmax-xmin).to_f / bins
         set xrange: 0..((xmax-xmin) / xticinterval).to_i
