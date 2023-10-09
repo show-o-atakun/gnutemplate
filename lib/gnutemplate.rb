@@ -53,7 +53,7 @@ module Gnutemplate
         set :xtics, "rotate by 90"
       end
 
-      xrange ||= (rows_min.to_a.flatten.compact.min)..(rows_max.to_a.flatten.compact.max)
+      xrange ||= (rows_min.map(&:to_a).flatten.compact.min)..(rows_max.map(&:to_a).flatten.compact.max)
       set xrange: xrange
       set :grid
       set style: :fill_solid
@@ -93,7 +93,7 @@ module Gnutemplate
         set :xtics, "rotate by 90"
       end
 
-      xrange ||= (rows_min.to_a.flatten.compact.min)..(rows_max.to_a.flatten.compact.max)
+      xrange ||= (rows_min.map(&:to_a).flatten.compact.min)..(rows_max.map(&:to_a).flatten.compact.max)
       set xrange: xrange
       set :grid
       set style: :fill_solid
@@ -123,8 +123,8 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.to_a.flatten.max
-    xmin ||= data.to_a.flatten.min
+    xmax ||= data.map(&:to_a).flatten.max
+    xmin ||= data.map(&:to_a).flatten.min
     freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
@@ -205,8 +205,8 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.to_a.flatten.max
-    xmin ||= data.to_a.flatten.min
+    xmax ||= data.map(&:to_a).flatten.max
+    xmin ||= data.map(&:to_a).flatten.min
     freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
