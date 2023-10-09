@@ -53,7 +53,7 @@ module Gnutemplate
         set :xtics, "rotate by 90"
       end
 
-      xrange ||= (rows_min.flatten.compact.min)..(rows_max.flatten.compact.max)
+      xrange ||= (rows_min.to_a.flatten.compact.min)..(rows_max.to_a.flatten.compact.max)
       set xrange: xrange
       set :grid
       set style: :fill_solid
@@ -93,7 +93,7 @@ module Gnutemplate
         set :xtics, "rotate by 90"
       end
 
-      xrange ||= (rows_min.flatten.compact.min)..(rows_max.flatten.compact.max)
+      xrange ||= (rows_min.to_a.flatten.compact.min)..(rows_max.to_a.flatten.compact.max)
       set xrange: xrange
       set :grid
       set style: :fill_solid
@@ -123,8 +123,8 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.flatten.max
-    xmin ||= data.flatten.min
+    xmax ||= data.to_a.flatten.max
+    xmin ||= data.to_a.flatten.min
     freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
@@ -180,7 +180,6 @@ module Gnutemplate
         xticinterval = (xmax-xmin).to_f / bins
         set xrange: 0..((xmax-xmin) / xticinterval).to_i
 
-
         xtics = freqs[0][0]
         .each.with_index
         .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
@@ -206,8 +205,8 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.flatten.max
-    xmin ||= data.flatten.min
+    xmax ||= data.to_a.flatten.max
+    xmin ||= data.to_a.flatten.min
     freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
