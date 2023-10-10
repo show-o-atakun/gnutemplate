@@ -123,9 +123,9 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.map(&:to_a).flatten.max
-    xmin ||= data.map(&:to_a).flatten.min
-    freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
+    xmax ||= data.map(&:to_a).flatten.compact.max
+    xmin ||= data.map(&:to_a).flatten.compact.min
+    freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
     Numo.noteplot do
@@ -205,9 +205,9 @@ module Gnutemplate
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
     colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
 
-    xmax ||= data.map(&:to_a).flatten.max
-    xmin ||= data.map(&:to_a).flatten.min
-    freqs = data.map {|d| d.to_a.histogram(bins, min: xmin, max: xmax) }
+    xmax ||= data.map(&:to_a).flatten.compact.max
+    xmin ||= data.map(&:to_a).flatten.compact.min
+    freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
     Numo.gnuplot do
