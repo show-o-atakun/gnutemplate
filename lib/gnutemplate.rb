@@ -189,7 +189,7 @@ module Gnutemplate
         labels ||= (0...(freqs.length)).map(&:to_s)
 
         args = freqs.zip(labels).each_with_index.map do |(f, l), i|
-          [*f, using: 2, :histogram, t: labels[i], fillcolor: "rgb \"#{colors[0 % 4]}\""]
+          [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
         end
 
         plot *args
@@ -278,7 +278,7 @@ module Gnutemplate
         labels ||= (0...(freqs.length)).map(&:to_s)
 
         args = freqs.zip(labels).each_with_index.map do |(f, l), i|
-          [*f, using: 2, :histogram, t: labels[i], fillcolor: "rgb \"#{colors[0 % 4]}\""]
+          [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
         end
 
         plot *args
