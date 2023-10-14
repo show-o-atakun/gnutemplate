@@ -193,9 +193,6 @@ module Gnutemplate
         end
 
         plot *args
-        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
-        #[*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
-        #[*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
 
       end # Of if pileup..else
     end # Of Numo.noteplot do
@@ -282,10 +279,6 @@ module Gnutemplate
         end
 
         plot *args
-,
-        #[*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
-        #[*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
-        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""]
       
       end # Of if pileup..else
     end # Of Numo.noteplot do
