@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["shun_yamaguchi_tc@live.jp"]
 
   spec.summary = "Templates of numo-gnuplot"
-  spec.description = "Templates of boxplot, histgram, etc."
+  spec.description = "Templates of boxplot, histogram, etc."
   spec.homepage = "https://github.com/show-o-atakun/gnutemplate"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.7.0"

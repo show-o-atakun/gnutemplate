@@ -186,9 +186,17 @@ module Gnutemplate
         .gsub(/,$/, ")")
         set xtics: xtics
 
-        plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
-        [*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
-        [*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
+        labels ||= (0...(freqs.length)).map(&:to_s)
+
+        args = freqs.zip(labels).each_with_index.map do |(f, l), i|
+          [*f, using: 2, :histogram, t: labels[i], fillcolor: "rgb \"#{colors[0 % 4]}\""]
+        end
+
+        plot *args
+        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
+        #[*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
+        #[*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
+
       end # Of if pileup..else
     end # Of Numo.noteplot do
 
@@ -267,9 +275,18 @@ module Gnutemplate
         .gsub(/,$/, ")")
         set xtics: xtics
 
-        plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
-        [*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
-        [*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
+        labels ||= (0...(freqs.length)).map(&:to_s)
+
+        args = freqs.zip(labels).each_with_index.map do |(f, l), i|
+          [*f, using: 2, :histogram, t: labels[i], fillcolor: "rgb \"#{colors[0 % 4]}\""]
+        end
+
+        plot *args
+
+        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
+        #[*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
+        #[*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
+      
       end # Of if pileup..else
     end # Of Numo.noteplot do
 
