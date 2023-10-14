@@ -173,7 +173,7 @@ module Gnutemplate
         set auto:"x"
         set :style, :data, :histogram
         set :style, :histogram, :cluster, gap:1
-        set :style, :fill_solid, border:-1
+        set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
         set boxwidth:0.9
         set :xtic, :rotate, by: rotate_xtics, scale: 0
 
@@ -262,7 +262,7 @@ module Gnutemplate
         set auto:"x"
         set :style, :data, :histogram
         set :style, :histogram, :cluster, gap:1
-        set :style, :fill_solid, border:-1
+        set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
         set boxwidth:0.9
         set :xtic, :rotate, by: rotate_xtics, scale: 0
 
@@ -282,10 +282,10 @@ module Gnutemplate
         end
 
         plot *args
-
-        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""],
+,
         #[*freqs[1], using: 2, w: :histogram, t: labels[1], fillcolor: "rgb \"#{colors[1 % 4]}\""],
         #[*freqs[2], using: 2, w: :histogram, t: labels[2], fillcolor: "rgb \"#{colors[2 % 4]}\""]
+        #plot [*freqs[0], using: 2, w: :histogram, t: labels[0], fillcolor: "rgb \"#{colors[0 % 4]}\""]
       
       end # Of if pileup..else
     end # Of Numo.noteplot do
