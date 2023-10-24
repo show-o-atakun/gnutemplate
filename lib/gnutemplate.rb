@@ -229,7 +229,7 @@ module Gnutemplate
         set output: file
       end
       
-      args = histogram(data, labels: labels, pileup: pileup,
+      args = Gnutemplate.histogram(data, labels: labels, pileup: pileup,
       xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, bins: bins,
       figsize: figsize, rotate_xtics: rotate_xtics,
       fill: fill, alpha: alpha, background: background)
@@ -325,7 +325,7 @@ module Gnutemplate
         set output: file
       end
       
-      args = histogram(data, labels: labels, pileup: pileup,
+      args = Gnutemplate.histogram(data, labels: labels, pileup: pileup,
       xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, bins: bins,
       figsize: figsize, rotate_xtics: rotate_xtics,
       fill: fill, alpha: alpha, background: background)
