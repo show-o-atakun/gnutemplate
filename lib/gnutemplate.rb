@@ -214,6 +214,7 @@ module Gnutemplate
 
     end # Of if pileup..else
   end
+  module_function :histogram
 
   def note_histogram(data, labels: nil, pileup: true,
     xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
@@ -404,5 +405,5 @@ module Gnutemplate
 
   end # Of def function
 
-  module_function :note_line, :draw_line, :note_box, :draw_box, :histogram, :note_histogram, :draw_histogram
+  module_function :note_line, :draw_line, :note_box, :draw_box, :note_histogram, :draw_histogram
 end # Of module
