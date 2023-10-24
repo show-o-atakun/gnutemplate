@@ -404,5 +404,5 @@ module Gnutemplate
 
   end # Of def function
 
-  module_function :note_line, :draw_line, :note_box, :draw_box, :note_histogram, :draw_histogram
+  module_function :note_line, :draw_line, :note_box, :draw_box, :histogram, :note_histogram, :draw_histogram
 end # Of module
