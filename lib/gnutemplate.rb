@@ -143,11 +143,6 @@ module Gnutemplate
     fill: true, alpha: 33, background: nil,
     file: nil)
 
-    if !file.nil?
-      set terminal: "gif"
-      set output: file
-    end
-
     data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
     alpha_hex = (alpha * 256 / 100).to_s(16).upcase
@@ -185,7 +180,7 @@ module Gnutemplate
         end
       end
 
-      plot *args 
+      return args 
 
     else
 
@@ -215,7 +210,7 @@ module Gnutemplate
         [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
       end
 
-      plot *args
+      return args
 
     end # Of if pileup..else
   end
@@ -228,81 +223,90 @@ module Gnutemplate
 
     Numo.noteplot do
 
-      data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
-
-      alpha_hex = (alpha * 256 / 100).to_s(16).upcase
-      colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
-  
-      xmax ||= data.map(&:to_a).flatten.compact.max
-      xmin ||= data.map(&:to_a).flatten.compact.min
-      freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
-      ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
-
       if !file.nil?
         set terminal: "gif"
         set output: file
       end
+      
+      args = histogram(data, labels: labels, pileup: pileup,
+      xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, bins: bins,
+      figsize: figsize, rotate_xtics: rotate_xtics,
+      fill: fill, alpha: alpha, background: background)
 
-      if pileup
-        ###########
-        ### 
-        ###########
+      plot *args
 
-        set size: "#{figsize},#{figsize}"  
-        set style: "fill solid" if fill
+      # data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
-        xticinterval = (xmax-xmin).to_f / bins
-        set xtics: "#{xmin-xticinterval}, #{xticinterval}, #{xmax+xticinterval}"
-        set(:xtics, "rotate by #{rotate_xtics}") if rotate_xtics
+      # alpha_hex = (alpha * 256 / 100).to_s(16).upcase
+      # colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
+  
+      # xmax ||= data.map(&:to_a).flatten.compact.max
+      # xmin ||= data.map(&:to_a).flatten.compact.min
+      # freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
+      # ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
-        set xrange: (xmin-xticinterval)..(xmax+xticinterval)
-        set yrange: ymin..ymax
 
-        args = background ? ["[#{xmin}:#{xmax}] #{ymax} with filledc above y=#{ymin} fc \"##{background}\" notitle", {}] : []
+      # if pileup
+      #   ###########
+      #   ### 
+      #   ###########
 
-        freqs.each_with_index do |f, i|
-          args.push f[0], f[1]
+      #   set size: "#{figsize},#{figsize}"  
+      #   set style: "fill solid" if fill
 
-          if labels
-            args.push({:with => :boxes, :title => labels[i], :fillcolor => "rgb \"#{colors[i % 4]}\""})
-          else
-            args.push({:with => :boxes, :fillcolor => "rgb \"#{colors[i % 4]}\""})
-          end
-        end
+      #   xticinterval = (xmax-xmin).to_f / bins
+      #   set xtics: "#{xmin-xticinterval}, #{xticinterval}, #{xmax+xticinterval}"
+      #   set(:xtics, "rotate by #{rotate_xtics}") if rotate_xtics
 
-        plot *args 
+      #   set xrange: (xmin-xticinterval)..(xmax+xticinterval)
+      #   set yrange: ymin..ymax
 
-      else
+      #   args = background ? ["[#{xmin}:#{xmax}] #{ymax} with filledc above y=#{ymin} fc \"##{background}\" notitle", {}] : []
 
-        ###########
-        ### 
-        ###########
-        # set title:"Temperature"
-        set auto:"x"
-        set :style, :data, :histogram
-        set :style, :histogram, :cluster, gap:1
-        set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
-        set boxwidth:0.9
-        set :xtic, :rotate, by: rotate_xtics, scale: 0
+      #   freqs.each_with_index do |f, i|
+      #     args.push f[0], f[1]
 
-        xticinterval = (xmax-xmin).to_f / bins
-        set xrange: 0..((xmax-xmin) / xticinterval).to_i
+      #     if labels
+      #       args.push({:with => :boxes, :title => labels[i], :fillcolor => "rgb \"#{colors[i % 4]}\""})
+      #     else
+      #       args.push({:with => :boxes, :fillcolor => "rgb \"#{colors[i % 4]}\""})
+      #     end
+      #   end
 
-        xtics = freqs[0][0]
-        .each.with_index
-        .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
-        .gsub(/,$/, ")")
-        set xtics: xtics
+      #   plot *args 
 
-        labels ||= (0...(freqs.length)).map(&:to_s)
+      # else
 
-        args = freqs.zip(labels).each_with_index.map do |(f, l), i|
-          [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
-        end
+      #   ###########
+      #   ### 
+      #   ###########
+      #   # set title:"Temperature"
+      #   set auto:"x"
+      #   set :style, :data, :histogram
+      #   set :style, :histogram, :cluster, gap:1
+      #   set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
+      #   set boxwidth:0.9
+      #   set :xtic, :rotate, by: rotate_xtics, scale: 0
 
-        plot *args
+      #   xticinterval = (xmax-xmin).to_f / bins
+      #   set xrange: 0..((xmax-xmin) / xticinterval).to_i
 
-      end # Of if pileup..else
+      #   xtics = freqs[0][0]
+      #   .each.with_index
+      #   .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
+      #   .gsub(/,$/, ")")
+      #   set xtics: xtics
+
+      #   labels ||= (0...(freqs.length)).map(&:to_s)
+
+      #   args = freqs.zip(labels).each_with_index.map do |(f, l), i|
+      #     [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
+      #   end
+
+      #   plot *args
+
+      # end # Of if pileup..else
+
     end # Of Numo.noteplot do
 
   end # Of def function
@@ -313,83 +317,90 @@ module Gnutemplate
     fill: true, alpha: 33, background: nil,
     file: nil)
 
-    data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
-
-    alpha_hex = (alpha * 256 / 100).to_s(16).upcase
-    colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
-
-    xmax ||= data.map(&:to_a).flatten.compact.max
-    xmin ||= data.map(&:to_a).flatten.compact.min
-    freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
-    ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
-
     Numo.gnuplot do
 
       if !file.nil?
         set terminal: "gif"
         set output: file
       end
-
-      if pileup
-        ###########
-        ### 
-        ###########
-
-        set size: "#{figsize},#{figsize}"  
-        set style: "fill solid" if fill
-
-        xticinterval = (xmax-xmin).to_f / bins
-        set xtics: "#{xmin-xticinterval}, #{xticinterval}, #{xmax+xticinterval}"
-        set(:xtics, "rotate by #{rotate_xtics}") if rotate_xtics
-
-        set xrange: (xmin-xticinterval)..(xmax+xticinterval)
-        set yrange: ymin..ymax
-
-        args = background ? ["[#{xmin}:#{xmax}] #{ymax} with filledc above y=#{ymin} fc \"##{background}\" notitle", {}] : []
-
-        freqs.each_with_index do |f, i|
-          args.push f[0], f[1]
-
-          if labels
-            args.push({:with => :boxes, :title => labels[i], :fillcolor => "rgb \"#{colors[i % 4]}\""})
-          else
-            args.push({:with => :boxes, :fillcolor => "rgb \"#{colors[i % 4]}\""})
-          end
-        end
-
-        plot *args # ,xs, ys, { with: :lines , title: "STD"}  
-
-      else
-
-        ###########
-        ### 
-        ###########
-        set auto:"x"
-        set :style, :data, :histogram
-        set :style, :histogram, :cluster, gap:1
-        set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
-        set boxwidth:0.9
-        set :xtic, :rotate, by: rotate_xtics, scale: 0
-
-        xticinterval = (xmax-xmin).to_f / bins
-        set xrange: 0..((xmax-xmin) / xticinterval).to_i
-
-        xtics = freqs[0][0]
-        .each.with_index
-        .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
-        .gsub(/,$/, ")")
-        set xtics: xtics
-
-        labels ||= (0...(freqs.length)).map(&:to_s)
-
-        args = freqs.zip(labels).each_with_index.map do |(f, l), i|
-          [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
-        end
-
-        plot *args
       
-      end # Of if pileup..else
-    end # Of Numo.noteplot do
+      args = histogram(data, labels: labels, pileup: pileup,
+      xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, bins: bins,
+      figsize: figsize, rotate_xtics: rotate_xtics,
+      fill: fill, alpha: alpha, background: background)
+
+      plot *args
+
+      # data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
+
+      # alpha_hex = (alpha * 256 / 100).to_s(16).upcase
+      # colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
+  
+      # xmax ||= data.map(&:to_a).flatten.compact.max
+      # xmin ||= data.map(&:to_a).flatten.compact.min
+      # freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
+      # ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
+
+      # if pileup
+      #   ###########
+      #   ### 
+      #   ###########
+
+      #   set size: "#{figsize},#{figsize}"  
+      #   set style: "fill solid" if fill
+
+      #   xticinterval = (xmax-xmin).to_f / bins
+      #   set xtics: "#{xmin-xticinterval}, #{xticinterval}, #{xmax+xticinterval}"
+      #   set(:xtics, "rotate by #{rotate_xtics}") if rotate_xtics
+
+      #   set xrange: (xmin-xticinterval)..(xmax+xticinterval)
+      #   set yrange: ymin..ymax
+
+      #   args = background ? ["[#{xmin}:#{xmax}] #{ymax} with filledc above y=#{ymin} fc \"##{background}\" notitle", {}] : []
+
+      #   freqs.each_with_index do |f, i|
+      #     args.push f[0], f[1]
+
+      #     if labels
+      #       args.push({:with => :boxes, :title => labels[i], :fillcolor => "rgb \"#{colors[i % 4]}\""})
+      #     else
+      #       args.push({:with => :boxes, :fillcolor => "rgb \"#{colors[i % 4]}\""})
+      #     end
+      #   end
+
+      #   plot *args # ,xs, ys, { with: :lines , title: "STD"}  
+
+      # else
+
+      #   ###########
+      #   ### 
+      #   ###########
+      #   set auto:"x"
+      #   set :style, :data, :histogram
+      #   set :style, :histogram, :cluster, gap:1
+      #   set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
+      #   set boxwidth:0.9
+      #   set :xtic, :rotate, by: rotate_xtics, scale: 0
+
+      #   xticinterval = (xmax-xmin).to_f / bins
+      #   set xrange: 0..((xmax-xmin) / xticinterval).to_i
+
+      #   xtics = freqs[0][0]
+      #   .each.with_index
+      #   .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
+      #   .gsub(/,$/, ")")
+      #   set xtics: xtics
+
+      #   labels ||= (0...(freqs.length)).map(&:to_s)
+
+      #   args = freqs.zip(labels).each_with_index.map do |(f, l), i|
+      #     [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
+      #   end
+
+      #   plot *args
+      
+      # end # Of if pileup..else
+    end # Of Numo.gnuplot do
 
   end # Of def function
 
