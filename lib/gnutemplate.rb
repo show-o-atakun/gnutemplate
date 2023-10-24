@@ -4,9 +4,32 @@ require_relative "gnutemplate/version"
 require "numo/gnuplot"
 require "histogram/array"
 
+module ExtendNP
+  def new_to_iruby
+      require 'tempfile'
+      tempfile_svg = Tempfile.open(['plot','.svg'])
+      # output SVG to tmpfile
+      gp = Numo::Gnuplot.default
+      gp.reset
+      gp.unset :multiplot    # added 
+      gp.set terminal:'svg'
+      gp.set output:tempfile_svg.path
+      gp.instance_eval(&@block)
+      ### gp.unset 'output'  # commented out
+      svg = File.read(tempfile_svg.path)
+      tempfile_svg.close
+      ["image/svg+xml",svg]
+    end
+end
+
+class Numo::Gnuplot::NotePlot
+  include ExtendNP
+  alias_method :old_to_iruby, :to_iruby
+  alias_method :to_iruby, :new_to_iruby
+end
+
 module Gnutemplate
   class Error < StandardError; end
-
   
   def note_line(data)
     Numo.noteplot do
@@ -112,11 +135,18 @@ module Gnutemplate
     end
   end
 
-  def note_histogram(data, labels: nil, pileup: true,
+  # いずれかはここからargsを返せるようにする
+  # set terminal部の扱いは考えなければならない(多分、_drow, _noteにif...set...end だけ残せばいい)
+  def histogram(data, labels: nil, pileup: true,
     xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
     figsize: 1.0, rotate_xtics: 45,
     fill: true, alpha: 33, background: nil,
-    file: nil, engine: :note)
+    file: nil)
+
+    if !file.nil?
+      set terminal: "gif"
+      set output: file
+    end
 
     data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
@@ -128,7 +158,85 @@ module Gnutemplate
     freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
     ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
+    if pileup
+      ###########
+      ### 
+      ###########
+
+      set size: "#{figsize},#{figsize}"  
+      set style: "fill solid" if fill
+
+      xticinterval = (xmax-xmin).to_f / bins
+      set xtics: "#{xmin-xticinterval}, #{xticinterval}, #{xmax+xticinterval}"
+      set(:xtics, "rotate by #{rotate_xtics}") if rotate_xtics
+
+      set xrange: (xmin-xticinterval)..(xmax+xticinterval)
+      set yrange: ymin..ymax
+
+      args = background ? ["[#{xmin}:#{xmax}] #{ymax} with filledc above y=#{ymin} fc \"##{background}\" notitle", {}] : []
+
+      freqs.each_with_index do |f, i|
+        args.push f[0], f[1]
+
+        if labels
+          args.push({:with => :boxes, :title => labels[i], :fillcolor => "rgb \"#{colors[i % 4]}\""})
+        else
+          args.push({:with => :boxes, :fillcolor => "rgb \"#{colors[i % 4]}\""})
+        end
+      end
+
+      plot *args 
+
+    else
+
+      ###########
+      ### 
+      ###########
+      # set title:"Temperature"
+      set auto:"x"
+      set :style, :data, :histogram
+      set :style, :histogram, :cluster, gap:1
+      set :style, :fill, solid: 1.0 - (alpha/100.0),  border:-1
+      set boxwidth:0.9
+      set :xtic, :rotate, by: rotate_xtics, scale: 0
+
+      xticinterval = (xmax-xmin).to_f / bins
+      set xrange: 0..((xmax-xmin) / xticinterval).to_i
+
+      xtics = freqs[0][0]
+      .each.with_index
+      .inject("(") { |result, (x, i)| result += "'#{x-xticinterval/2}-#{x+xticinterval/2}' #{i}," }
+      .gsub(/,$/, ")")
+      set xtics: xtics
+
+      labels ||= (0...(freqs.length)).map(&:to_s)
+
+      args = freqs.zip(labels).each_with_index.map do |(f, l), i|
+        [*f, using: 2, w: :histogram, t: labels[i], fillcolor: "rgb \"#{colors[i % 4]}\""]
+      end
+
+      plot *args
+
+    end # Of if pileup..else
+  end
+
+  def note_histogram(data, labels: nil, pileup: true,
+    xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
+    figsize: 1.0, rotate_xtics: 45,
+    fill: true, alpha: 33, background: nil,
+    file: nil)
+
     Numo.noteplot do
+
+      data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
+
+      alpha_hex = (alpha * 256 / 100).to_s(16).upcase
+      colors = ["##{alpha_hex}CC0000", "##{alpha_hex}00CC00", "##{alpha_hex}0000CC", "##{alpha_hex}888800"]
+  
+      xmax ||= data.map(&:to_a).flatten.compact.max
+      xmin ||= data.map(&:to_a).flatten.compact.min
+      freqs = data.map {|d| d.to_a.compact.histogram(bins, min: xmin, max: xmax) }
+      ymax ||= freqs.map{ _1[1] }.flatten.max * 1.1
 
       if !file.nil?
         set terminal: "gif"
@@ -203,7 +311,7 @@ module Gnutemplate
     xmin: nil, xmax: nil, ymin: 0, ymax: nil, bins: 10,
     figsize: 1.0, rotate_xtics: 45,
     fill: true, alpha: 33, background: nil,
-    file: nil, engine: :note)
+    file: nil)
 
     data = [data] if data[0].kind_of?(Numeric) || data[0].nil?
 
