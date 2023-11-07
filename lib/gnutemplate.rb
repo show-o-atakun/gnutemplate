@@ -69,6 +69,10 @@ module Gnutemplate
     end
   end
 
+  def box(rows, titlenames, xrange: nil, xtics: nil, title: nil, file: nil, alpha: 60)
+
+  end
+
   # 一つのデータで min, max 2列必要とするので
   # rows = [minデータ1, maxデータ1, minデータ2, maxデータ2, ...] という形式で入れてやる
   # xrangeはx軸の範囲(数値..数値の範囲で指定)で、xticsは実際に目盛に表示するラベル(Stringなどの配列)
@@ -339,7 +343,7 @@ module Gnutemplate
 	end # of Numo.noteplot
   end # of def draw
 
-  def draw(subplot, settings, campus_size: nil, file: nil, multicolumn: 1) # for any plot function
+  def draw(subplot, file: nil, campus_size: nil, multicolumn: 1) # for any plot function
 	
 	subplot = [subplot] if !subplot.is_a?(Array)
 	
